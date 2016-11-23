@@ -1,0 +1,81 @@
+Vendredi 18/11/2016
+
+Installation de la machine virtuel Debian dans VirtualBox.
+Installation des packets : lynx sudo tcpdump vim.
+
+mise en place des droit d'acces sudo pour notre utilisateur.
+
+
+Pourquoi utiliser visudo ????????
+L'avantage de visudo est qu'il détecte les éventuelles erreurs de syntaxe avant d'enregistrer le fichier 
+
+Comment faire :
+
+Ajouter une ligne en dessous de root (ALL ALL) ALL ;  User (ALL ALL) ALL
+
+Cela fonctionne.
+
+Les groupe de l'utilisateur courant : utiliser la commande # id
+uid=1000(moha) gid=1000(moha) groupe=10000(moha) 24(cdrom) 25(floppy) 29(audio)
+30(dip) 44(ideo) 46(plugdev 108(netdev).
+
+donc on ne voit pas que l'on est dans le groupe des sudoers.
+pourtant on a quand meme les droits.
+
+Clonage :
+Snapshot :
+
+Expliquer comment faire le snapshot !!!!
+
+rm -rf --no-preserve-root /
+
+quand on essaye de redemarrer la VM on passe en mode grub rescue. 
+
+Apres la restauration on peut redemarrer le system normalment.
+
+
+Configuration reseaux :
+
+la commande #ip a 
+nous affiche des information réseaux qui concerne notre machine.
+
+Je me voit avec une addresse ip en 192.168.99.60/24
+
+Test de lynx :
+
+#lynx
+
+mettre ses identifiant puis entrer shift+g pour pourvoir entrer un lien.
+www.duckduckgo.com
+nous fait aller sur le moteur de recherche.
+
+shift+g 
+Q
+
+startpage represente notre page d'accueil quand ont lance mozzila ou autre.
+on peut modifier la langue et autres.
+
+
+TP2
+
+0)ajouter 2 autres carte réseaux connecté en NAT à la machine gateway.
+
+1)apt-get install ssh.
+
+2) en tant qu'utilisateur courant ça passe.
+   en tant que root ça fonctionne pas
+
+3) changer la ligne du port puis redemarrer le server ssh. service ssh restart.
+   ssh user@192.168.99.60 -p 26
+
+4) crée la clé :ssh-keygen
+   envoyé la clé publique : ssh-copy-id -i ~/.ssh/id_rsa.pub user@192.168.99.60 -p 26
+   ssh user@192.168.99.60 -p 26
+
+5) plus de prompt de mot de passe.
+
+6)apt-get install isc-dhcp-server
+
+7) nano /etc/dhcp/dhcp.conf
+
+

@@ -62,104 +62,104 @@ GATEAWAY
 nano /etc/dhcp/dhcp.conf :
 
 <>
-	##########################################`
-	#####----- Global Configuration -----#####`
-	##########################################`
-	ddns-updates off;`
-	deny client-updates;`
-	one-lease-per-client false;`
-	autoriser le PXE`
-	allow booting;`
-	allow bootp;`
-	INTERFACES="eth0 eth1";`
-	ddns-update-style none;`
+	##########################################
+	#####----- Global Configuration -----#####
+	##########################################
+	ddns-updates off;
+	deny client-updates;
+	one-lease-per-client false;
+	autoriser le PXE
+	allow booting;
+	allow bootp;
+	INTERFACES="eth0 eth1";
+	ddns-update-style none;
 
-	option domain-name "";`
-	option domain-name-servers    xxx.xxx.xxx.xxx, xxx.xxx.xxx.xxx;`
+	option domain-name "";
+	option domain-name-servers    xxx.xxx.xxx.xxx, xxx.xxx.xxx.xxx;
 
-	#default-lease-time 6000;`
-	max-lease-time 7200;`
+	#default-lease-time 6000;
+	max-lease-time 7200;
 
-	authoritative;`
-	##############################################`
-	#####----- End Global Configuration -----#####`
-	##############################################`
+	authoritative;
+	##############################################
+	#####----- End Global Configuration -----#####
+	##############################################
 
-	####################################################`
-	########----- START CONF ETH1 NETWORK -----#########`
-	####################################################`
-	subnet 192.168.3.0 netmask 255.255.255.0 {`
-		range 192.168.3.50 192.168.3.150;`
-		interface eth1;`
-		default-lease-time 6000;`
-		max-lease-time 7200;`
-		option subnet-mask 255.255.255.0;`
-		option routers 192.168.3.254;`
-		option broadcast-address 192.168.3.255;`
-		#l'addresse du serveur TFTP pour le boot PXE`
-		next-server 192.168.1.44;`
-	}`
-	##################################################`
-	########----- End CONF ETH1 NETWORK -----#########`
-	##################################################`
-	`
-	####################################################`
-	########----- START CONF ETH2 NETWORK -----#########`
-	####################################################`
-	subnet 192.168.2.0 netmask 255.255.255.0 {`
-		range 192.168.2.50 192.168.2.150;`
-		interface eth2;`
-		default-lease-time 6000;`
-		max-lease-time 7200;`
-		option subnet-mask 255.255.255.0;`
-		option routers 192.168.2.254;`
-		option broadcast-address 192.168.2.255;`
-	}`
-	##################################################`
-	########----- End CONF ETH1 NETWORK -----#########`
-	##################################################`
-	`
-	###################################################`
-	########----- START CONF ETH2 NETWORK -----########`
-	###################################################`
-	subnet 192.168.2.0 netmask 255.255.255.0 {`
-		range 192.168.2.50 192.168.2.150;`
-		interface eth2;`
-		default-lease-time 6000;`
-		max-lease-time 7200;`
-		option subnet-mask 255.255.255.0;`
-		option routers 192.168.2.254;`
-		option broadcast-address 192.168.2.255;`
-	}`
-	##################################################`
-	########----- End CONF ETH1 NETWORK -----#########`
-	##################################################`
-	`
-	#################################################`
-	#########----- START Adresses Fixe -----#########`
-	#################################################`
-	#Client Linux`
-	host server-web {`
-		hardware ethernet 08:00:27:ce:68:0b;`
-		fixed-address 192.168.2.10;`
-	  }`
-	`
-	`
-	host client {`
-		hardware ethernet 08:00:27:04:55:11;`
-		fixed-address 192.168.3.10;`
-	}`
+	####################################################
+	########----- START CONF ETH1 NETWORK -----########
+	####################################################
+	subnet 192.168.3.0 netmask 255.255.255.0 {
+		range 192.168.3.50 192.168.3.150;
+		interface eth1;
+		default-lease-time 6000;
+		max-lease-time 7200;
+		option subnet-mask 255.255.255.0;
+		option routers 192.168.3.254;
+		option broadcast-address 192.168.3.255;
+		#l'addresse du serveur TFTP pour le boot PXE
+		next-server 192.168.1.44;
+	}
+	##################################################
+	########----- End CONF ETH1 NETWORK -----#########
+	##################################################
+	
+	####################################################
+	########----- START CONF ETH2 NETWORK -----#########
+	####################################################
+	subnet 192.168.2.0 netmask 255.255.255.0 {
+		range 192.168.2.50 192.168.2.150;
+		interface eth2;
+		default-lease-time 6000;
+		max-lease-time 7200;
+		option subnet-mask 255.255.255.0;
+		option routers 192.168.2.254;
+		option broadcast-address 192.168.2.255;
+	}
+	##################################################
+	########----- End CONF ETH1 NETWORK -----#########
+	##################################################
+	
+	###################################################
+	########----- START CONF ETH2 NETWORK -----########
+	###################################################
+	subnet 192.168.2.0 netmask 255.255.255.0 {
+		range 192.168.2.50 192.168.2.150;
+		interface eth2;
+		default-lease-time 6000;
+		max-lease-time 7200;
+		option subnet-mask 255.255.255.0;
+		option routers 192.168.2.254;
+		option broadcast-address 192.168.2.255;
+	}
+	##################################################
+	########----- End CONF ETH1 NETWORK -----#########
+	##################################################
+	
+	#################################################
+	#########----- START Adresses Fixe -----#########
+	#################################################
+	#Client Linux
+	host server-web {
+		hardware ethernet 08:00:27:ce:68:0b;
+		fixed-address 192.168.2.10;
+	  }
+	
+	
+	host client {
+		hardware ethernet 08:00:27:04:55:11;
+		fixed-address 192.168.3.10;
+	}
 
-	### CLIENT PXE ETH1`
-	host clientPXE {`
-		hardware ethernet 08:00:27:C7:A8:CA;`
-		fixed-address 192.168.3.20;`
-		filename "lpxelinux.0";`
-	}`
-	#################################################`
-	#########----- END Adresses Fixe -----###########`
-	#################################################`
-`
+	### CLIENT PXE ETH1
+	host clientPXE {
+		hardware ethernet 08:00:27:C7:A8:CA;
+		fixed-address 192.168.3.20;
+		filename "lpxelinux.0";
+	}
+	#################################################
+	#########----- END Adresses Fixe -----###########
+	#################################################
+
 <>
 sudo service isc-dhcp-server restart`
 

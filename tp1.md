@@ -332,7 +332,9 @@ modifier la ligne et mettre =1
 	#REGLE NAT POSTROUTING
 	iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
 <>
-IPTABLES_NAT
+
+
+#IPTABLES_NAT
 camoufle tout ce qui sort par l'interface eth0 qui est l'interface connecté à internet
 iptables -t nat -A POSTROUTING -o eth0 MASQUERADE
 

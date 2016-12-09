@@ -1,0 +1,345 @@
+Vendredi 18/11/2016
+
+Installation de la machine virtuel Debian dans VirtualBox.
+Installation des packets : lynx sudo tcpdump vim.
+
+mise en place des droit d'acces sudo pour notre utilisateur.
+
+
+Pourquoi utiliser visudo ????????
+L'avantage de visudo est qu'il détecte les éventuelles erreurs de syntaxe avant d'enregistrer le fichier 
+
+Comment faire :
+
+Ajouter une ligne en dessous de root (ALL ALL) ALL ;  User (ALL ALL) ALL
+
+Cela fonctionne.
+
+Les groupe de l'utilisateur courant : utiliser la commande # id
+uid=1000(moha) gid=1000(moha) groupe=10000(moha) 24(cdrom) 25(floppy) 29(audio)
+30(dip) 44(ideo) 46(plugdev 108(netdev).
+
+donc on ne voit pas que l'on est dans le groupe des sudoers.
+pourtant on a quand meme les droits.
+
+Clonage : ...
+Snapshot : ....
+
+Expliquer comment faire le snapshot via virtual box!!!!
+
+tout delete sur la machine :
+rm -rf --no-preserve-root /
+
+quand on essaye de redemarrer la VM on passe en mode grub rescue. 
+
+Apres la restauration on peut redemarrer le system normalment.
+
+
+Configuration reseaux :
+
+la commande #ip a 
+nous affiche des information réseaux qui concerne notre machine.
+
+Je me voit avec une addresse ip en 192.168.99.60/24
+
+Test de lynx :
+
+#lynx
+
+mettre ses identifiant puis entrer shift+g pour pourvoir entrer un lien.
+www.duckduckgo.com
+nous fait aller sur le moteur de recherche.
+
+shift+g : pour entrer une address
+shift+q : pour quitter
+
+startpage represente notre page d'accueil quand ont lance mozzila ou autre.
+on peut modifier la langue et autres.
+
+
+
+TP2
+
+0)ajouter 2 autres carte réseaux connecté en reseau NAT à la machine gateway.
+
+1)apt-get install ssh.
+
+2) en tant qu'utilisateur courant ça passe.
+   en tant que root ça fonctionne pas
+
+3) changer la ligne du port puis redemarrer le server ssh. service ssh restart.
+   ssh user@192.168.99.60 -p 26
+
+4) crée la clé :ssh-keygen
+   envoyé la clé publique : ssh-copy-id -i ~/.ssh/id_rsa.pub user@192.168.99.60 -p 26
+   ssh user@192.168.99.60 -p 26
+
+5) plus de prompt de mot de passe.
+
+6)apt-get install isc-dhcp-server
+
+7) nano /etc/dhcp/dhcp.conf
+
+
+##########################################
+#####----- Global Configuration -----#####
+##########################################
+ddns-updates off;
+deny client-updates;
+#one-lease-per-client false;
+#autoriser le PXE
+allow booting;
+allow bootp;
+INTERFACES="eth0 eth1";
+ddns-update-style none;
+
+#option domain-name "";
+#option domain-name-servers    xxx.xxx.xxx.xxx, xxx.xxx.xxx.xxx;
+
+#default-lease-time 6000;
+max-lease-time 7200;
+
+authoritative;
+##############################################
+#####----- End Global Configuration -----#####
+##############################################
+
+####################################################
+########----- START CONF ETH1 NETWORK -----#########
+####################################################
+subnet 192.168.3.0 netmask 255.255.255.0 {
+        range 192.168.3.50 192.168.3.150;
+        interface eth1;
+        default-lease-time 6000;
+        max-lease-time 7200;
+        option subnet-mask 255.255.255.0;
+        option routers 192.168.3.254;
+        option broadcast-address 192.168.3.255;
+        #l'addresse du serveur TFTP pour le boot PXE
+        next-server 192.168.1.44;
+}
+##################################################
+########----- End CONF ETH1 NETWORK -----#########
+##################################################
+
+####################################################
+########----- START CONF ETH2 NETWORK -----#########
+####################################################
+subnet 192.168.2.0 netmask 255.255.255.0 {
+        range 192.168.2.50 192.168.2.150;
+        interface eth2;
+        default-lease-time 6000;
+        max-lease-time 7200;
+        option subnet-mask 255.255.255.0;
+        option routers 192.168.2.254;
+        option broadcast-address 192.168.2.255;
+}
+##################################################
+########----- End CONF ETH1 NETWORK -----#########
+##################################################
+
+####################################################
+########----- START CONF ETH2 NETWORK -----#########
+####################################################
+subnet 192.168.2.0 netmask 255.255.255.0 {
+        range 192.168.2.50 192.168.2.150;
+        interface eth2;
+        default-lease-time 6000;
+        max-lease-time 7200;
+        option subnet-mask 255.255.255.0;
+        option routers 192.168.2.254;
+        option broadcast-address 192.168.2.255;
+}
+##################################################
+########----- End CONF ETH1 NETWORK -----#########
+##################################################
+
+#################################################
+#########----- START Adresses Fixe -----#########
+#################################################
+#Client Linux
+host server-web {
+        hardware ethernet 08:00:27:ce:68:0b;
+        fixed-address 192.168.2.10;
+  }
+
+
+host client {
+        hardware ethernet 08:00:27:04:55:11;
+        fixed-address 192.168.3.10;
+}
+
+### CLIENT PXE ETH1
+host clientPXE {
+        hardware ethernet 08:00:27:C7:A8:CA;
+        fixed-address 192.168.3.20;
+        filename "lpxelinux.0";
+}
+#################################################
+#########----- END Adresses Fixe -----###########
+#################################################
+
+Il nous faut des address static sur nos eth1 et eth2 étant donnée qu'elles seront les GW de nos NAT NETWORK 1et 2
+ 
+Fichier de conf à modifier :
+ETC/NETWORK/INTERFACE
+
+# The primary network interface
+allow-hotplug eth0
+iface eth0 inet dhcp
+
+allow-hotplug eth1
+iface eth1 inet static
+        address 192.168.3.254
+        netmask 255.255.255.0
+        #gateway eth0
+
+allow-hotplug eth2
+iface eth2 inet static
+        address 192.168.2.254
+        netmask 255.255.255.0
+        #gateway eth0
+
+
+EXPLIUQER COMMENT MARCHE LE NAT NETWORK SOUS VIRTUAL BOX 
+
+
+POUR ACTIVER LE ROUTAGE FAUT MODIFIER LE FICHIER DE CONF 
+verifier si le routage est activer :
+sysctl net.ipv4.ip_forward
+si la valeur retourner est egal à 0 il faut l'activer :
+2 façon :
+
+sysctl -w net.ipv4.ip_forward=1
+
+ou
+
+/etc/sysctl/syctl.conf
+
+modifier la ligne et mettre =1
+
+net.ipv4.ip_forward=0 
+
+MON SCRIPT IPTABLES:
+
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides: firewall.sh
+# Required-Start: $networking
+# Required-Stop: $local_fs
+# X-Start-Before: $ifupdown
+# X-Start-After: $ifupdown
+# Default-Start: S
+# Default-Stop:       0 6
+# Short-description: Firewall
+# Description: Mise en places des règles iptables
+### END INIT INFO
+# Vider les tables actuelles
+iptables -t filter -F
+
+# Vider les règles personnelles
+iptables -t filter -X
+
+# Interdire toute connexion entrante et sortante
+iptables -t filter -P INPUT DROP
+iptables -t filter -P FORWARD DROP
+iptables -t filter -P OUTPUT DROP
+
+# ---
+
+# Ne pas casser les connexions etablies
+iptables -A INPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -m state --state RELATED,ESTABLISHED -j ACCEPT
+iptables -A FORWARD -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# Autoriser loopback
+iptables -t filter -A INPUT -i lo -j ACCEPT
+iptables -t filter -A OUTPUT -o lo -j ACCEPT
+
+# ICMP (Ping)
+#iptables -t filter -A INPUT -p icmp -j ACCEPT
+#iptables -t filter -A OUTPUT -p icmp -j ACCEPT
+
+# ---
+
+# SSH In PORT 26
+iptables -t filter -A INPUT -p tcp --dport 26 -j ACCEPT
+
+# SSH Out 22
+iptables -t filter -A OUTPUT -p tcp --dport 22 -j ACCEPT
+
+# DNS In/Out
+iptables -t filter -A OUTPUT -p tcp --dport 53 -j ACCEPT
+iptables -t filter -A OUTPUT -p udp --dport 53 -j ACCEPT
+iptables -t filter -A INPUT -p tcp --dport 53 -j ACCEPT
+iptables -t filter -A INPUT -p udp --dport 53 -j ACCEPT
+
+# HTTP + HTTPS Out
+iptables -t filter -A OUTPUT -p tcp --dport 80 -j ACCEPT
+iptables -t filter -A OUTPUT -p tcp --dport 443 -j ACCEPT
+iptables -t filter -A OUTPUT -p tcp --dport 8080 -j ACCEPT
+
+# HTTP + HTTPS In
+iptables -t filter -A INPUT -p tcp --dport 80 -j ACCEPT
+iptables -t filter -A INPUT -p tcp --dport 443 -j ACCEPT
+iptables -t filter -A INPUT -p tcp --dport 8080 -j ACCEPT
+
+# REGLE POUR LE PXE: TFTP
+
+iptables -t filter -A INPUT -p udp --dport 69 -j ACCEPT
+iptables -t filter -A OUTPUT -p udp --dport 69 -j ACCEPT
+#iptables -t filter -A FORWARD -p udp --dport 69 -j ACCEPT
+
+# REGLE FORWARD ETH1 VERS ETH2
+iptables -t filter -A FORWARD -i eth1 -o eth2 -p tcp --dport 80 -j ACCEPT
+iptables -t filter -A FORWARD -i eth1 -o eth2 -p tcp --dport 443 -j ACCEPT
+iptables -t filter -A FORWARD -i eth1 -o eth2 -p tcp --dport 115 -j ACCEPT
+iptables -t filter -A FORWARD -i eth1 -o eth2 -p tcp --dport 22 -j ACCEPT
+
+#PING
+#iptables -t filter -A FORWARD -i eth1 -o eth2 -p icmp -j ACCEPT
+#iptables -t filter -A FORWARD -i eth1 -o eth0 -p icmp -j ACCEPT
+
+#REGLE FORWARD ETH2 VERS ETH1
+iptables -t filter -A FORWARD -i eth2 -o eth1 -p tcp --dport 80 -j ACCEPT
+iptables -t filter -A FORWARD -i eth2 -o eth1 -p tcp --dport 443 -j ACCEPT
+
+#PING
+#iptables -t filter -A FORWARD -i eth2 -o eth1 -p icmp -j ACCEPT
+#iptables -t filter -A FORWARD -i eth2 -o eth0 -p icmp -j ACCEPT
+
+
+#DEFAULT FORWARD ROUTE (ETH1,2 VERS ETH0)
+iptables -t filter -A FORWARD -i eth2 -o eth0 -j ACCEPT
+iptables -t filter -A FORWARD -i eth1 -o eth0 -j ACCEPT
+
+
+#REGLE NAT POSTROUTING
+iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+
+ 
+
+IPTABLES_NAT
+camoufle tout ce qui sort par l'interface eth0 qui est l'interface connecté à internet
+iptables -t nat -A POSTROUTING -o eth0 MASQUERADE
+
+vérifier que c'est bien ajouté
+iptables -t nat -L -v
+
+modifier le /etc/resolv.conf pour avoir un DNS sur chaque machine (CLIENT, SRV_WEB)
+ajouter les route par defauts de chacune des machine si elle n'y sont pas.
+etant donnée que la route par defaut est l'intarface 1 pour chaque machine.
+route add default gw dev eth0
+
+
+_______________________________________________________________
+
+
+Pour le pxe avec un firewall faut mettre ajouter le 
+# modprobe nf_conntrack_tftp
+pour que ce module reste actif apres un redemarrage il faut l'ajouter dans le fichier
+# /etc/modules
+
+
+ 
+

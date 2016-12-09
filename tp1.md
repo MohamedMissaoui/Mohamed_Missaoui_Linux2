@@ -402,14 +402,15 @@ route add default gw dev eth0.
 ================
 
 # /etc/default/tftpd-hpa
+<>
 
-TFTP_USERNAME="tftp"
-TFTP_DIRECTORY="/var/www/pxe"
-TFTP_ADDRESS="192.168.1.44:69"
-TFTP_OPTIONS="--secure"
-RUN_DAEMON="yes"
+	TFTP_USERNAME="tftp"
+	TFTP_DIRECTORY="/var/www/pxe"
+	TFTP_ADDRESS="192.168.1.44:69"
+	TFTP_OPTIONS="--secure"
+	RUN_DAEMON="yes"
 
-
+<>
 
 
 #Modules 
